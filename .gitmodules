@@ -1,0 +1,12 @@
+[submodule "bonobo"]
+	path = bonobo
+	url = git@github.com:python-bonobo/bonobo.git
+[submodule "vendors/edgy-project"]
+	path = vendors/edgy-project
+	url = git@github.com:python-edgy/project.git
+[submodule "vendors/edgy-event"]
+	path = vendors/edgy-event
+	url = git@github.com:python-edgy/event.git
+[submodule "bonobo-docker"]
+	path = bonobo-docker
+	url = git@github.com:python-bonobo/bonobo-docker.git
