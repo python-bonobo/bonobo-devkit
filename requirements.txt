@@ -1,6 +1,4 @@
+gitpython
+jinja2
+pyyaml
 twine
--e ./vendors/edgy-event/
--e ./vendors/edgy-project/
--e ./bonobo/[dev]
--e ./bonobo-docker/[dev]
--e ./bonobo-sqlalchemy/[dev]

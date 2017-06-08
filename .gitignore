@@ -26,7 +26,11 @@
 .spyderproject
 .tox/
 .webassets-cache
-/.envs
+/.requirements.local.txt
+/.virtualenvs
+/bonobo*
+/output/
+/vendors/*
 __pycache__/
 build/
 coverage.xml
