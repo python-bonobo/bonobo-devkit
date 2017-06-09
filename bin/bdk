@@ -1,0 +1,5 @@
+#! /bin/bash
+
+__path__=$(cd $(dirname "$0")/..; pwd)
+
+(cd $__path__; bin/python bin/_bdk.py $*)

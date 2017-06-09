@@ -32,7 +32,7 @@ VERSION := $(shell $(PYTHON) $(PACKAGE)/setup.py --version 2>/dev/null)
 .PHONY: install do-install do-install-reqs $(INSTALL_TARGETS) $(INSTALL_REQS_TARGETS)
 
 install: $(INSTALL_TARGETS)
-	$(PYTHON) bin/install.py
+	$(PYTHON) bin/_bdk.py init
 	$(MAKE) -j2 $(INSTALL_REQS_TARGETS)
 
 do-install: $(PYTHON_BASE)

@@ -29,6 +29,8 @@
 /.requirements.local.txt
 /.virtualenvs
 /bonobo*
+/config.local.yml
+/demos
 /output/
 /vendors/*
 __pycache__/
