@@ -10,6 +10,6 @@ install:
   - env
   - pip install coveralls
 script:
-  - make test
+  - SKIP_VIRTUALENV=1 GITHUB_PROTOCOL=https make test
 after_success:
   - coveralls
