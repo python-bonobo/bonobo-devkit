@@ -6,7 +6,7 @@ python:
   - 3.6-dev
   - nightly
 install:
-  - GITHUB_PROTOCOL=https make install
+  - SKIP_VIRTUALENV=1 GITHUB_PROTOCOL=https make install
   - env
   - ls -lsah .virtualenvs/3.*/bin/
   - pip install coveralls
