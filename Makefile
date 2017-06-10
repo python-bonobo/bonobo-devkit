@@ -13,7 +13,7 @@ PYTEST ?= $(PYTHON_BIN)/pytest
 PYTEST_OPTIONS ?= --capture=no
 TWINE ?= $(PYTHON_BIN)/twine
 SYSTEMPYTHON ?= $(shell which python$(PYTHON_VERSION))
-SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m venv
+SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m venv --copies
 
 FORMAT_TARGETS := $(addprefix format-,$(PACKAGES))
 INSTALL_REQS_TARGETS := $(addprefix install-reqs-,$(PYTHON_VERSIONS))
