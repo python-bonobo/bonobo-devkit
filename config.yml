@@ -1,23 +1,23 @@
 repositories:
-    - bonobo[dev]:
+    - 'bonobo@develop[dev]':
         origin: {{ github('bonobo') }}
         upstream: {{ github('bonobo', user='python-bonobo') }}
 
-    - bonobo-docker[dev]:
+    - 'bonobo-docker[dev]':
         origin: {{ github('bonobo-docker') }}
         upstream: {{ github('bonobo-docker', user='python-bonobo') }}
 
-    - bonobo-sqlalchemy[dev]:
+    - 'bonobo-sqlalchemy[dev]':
         origin: {{ github('bonobo-sqlalchemy') }}
         upstream: {{ github('bonobo-sqlalchemy', user='python-bonobo') }}
 
-    - bonobo-selenium[dev]:
+    - 'bonobo-selenium[dev]':
         origin: {{ github('bonobo-selenium') }}
         upstream: {{ github('bonobo-selenium', user='python-bonobo') }}
 
-    - vendors/edgy-event:
+    - 'vendors/edgy-event':
         origin: {{ github('event', user='python-edgy') }}
 
-    - vendors/edgy-project:
+    - 'vendors/edgy-project':
         origin: {{ github('project', user='python-edgy') }}
 

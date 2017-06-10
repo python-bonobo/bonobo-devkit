@@ -78,11 +78,13 @@ def iter_repositories(repositories, *, filter_=None):
     for repository in repositories:
         assert len(repository) == 1
         path, remotes = list(repository.items())[0]
+        branch = None
         extras = ''
 
-        match = re.match('^(.*)\[(.*)\]$', path)
+        match = re.match('^([^@\[\]]*)(:?@[a-z0-9-]+)?\[(.*)\]$', path)
         if match:
-            path, extras = match.groups()
+            path, branch, extras = match.groups()
+            branch = branch[1:] if branch else None
 
         if filter_ and path != filter_:
             continue
@@ -95,7 +97,7 @@ def iter_repositories(repositories, *, filter_=None):
                 raise RuntimeError('No origin or upstream configured for {}.'.format(path))
 
             logger.info('Cloning {} from {}'.format(path, remote_url))
-            os.system('git clone ' + remote_url + ' ' + path)
+            os.system('git clone ' + ' '.join((remote_url, path, ) + ('-b', branch, ) if branch else ()))
 
         repo = git.Repo(path)
 
