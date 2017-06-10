@@ -1,21 +1,27 @@
 bonobo-devkit
 =============
 
-A convenience repository containing all tools to work efficiently on bonobo and its extensions.
+THIS REPOSITORY HELPS TO WORK ON THE BONOBO SOURCE CODE OR FUTURE VERSIONS OF BONOBO, IF YOU JUST WANT TO USE STABLE
+VERSION AND WRITE ETL JOBS, LOOK AT https://www.bonobo-project.org/getting-started INSTEAD.
+
+You may need this repository if:
+
+* You want to submit patches to the bonobo core, or etensions.
+* You want to try the future versions of bonobo.
 
 Requirements
 ::::::::::::
 
 * `virtualenv`, `python3.5` and `python3.6` should be accessible from path.
 * Github access using ssl should be possible. You don't need r/w access to bonobo repository, but your ssh key should
-  allow some access to github.
+  allow some access to github so it can use ssh+git urls.
 
 Setup
 :::::
 
-* Setup your github username if not done yet: `git config --global github.user hartym`
+* Setup your github username in git config if not done yet: `git config --global github.user hartym`
 * Run `make` (will create two virtualenv, clone the needed repositories, setup the correct remotes and install all
-  packages as editable in both virtualenv).
+  packages as editable in both virtualenvs).
 
 Once this is done, a helper script is available in `bin/bdk` to work on multiple repositories at once:
 
