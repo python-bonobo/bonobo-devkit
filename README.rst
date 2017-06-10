@@ -4,6 +4,9 @@ bonobo-devkit
 THIS REPOSITORY HELPS TO WORK ON THE BONOBO SOURCE CODE OR FUTURE VERSIONS OF BONOBO, IF YOU JUST WANT TO USE STABLE
 VERSION AND WRITE ETL JOBS, LOOK AT https://www.bonobo-project.org/getting-started INSTEAD.
 
+.. image:: https://travis-ci.org/python-bonobo/bonobo-devkit.svg?branch=master
+    :target: https://travis-ci.org/python-bonobo/bonobo-devkit
+
 You may need this repository if:
 
 * You want to submit patches to the bonobo core, or etensions.
