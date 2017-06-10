@@ -6,6 +6,7 @@ python:
   - 3.6-dev
   - nightly
 install:
+  - pip install -U pip
   - GITHUB_PROTOCOL=https make install
   - pip install coveralls
 script:
