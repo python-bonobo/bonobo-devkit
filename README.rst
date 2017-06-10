@@ -12,7 +12,7 @@ You may need this repository if:
 Requirements
 ::::::::::::
 
-* `virtualenv`, `python3.5` and `python3.6` should be accessible from path.
+* `virtualenv`, and at least one of `python3.5`, `python3.6` and `python3.7` should be accessible from path.
 * Github access using ssl should be possible. You don't need r/w access to bonobo repository, but your ssh key should
   allow some access to github so it can use ssh+git urls.
 
