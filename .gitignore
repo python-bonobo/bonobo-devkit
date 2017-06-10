@@ -29,7 +29,8 @@
 .webassets-cache
 /.requirements.local.txt
 /.virtualenvs
-/bonobo*
+/bonobo*/
+/cookiecutter-bonobo/
 /config.local.yml
 /demos
 /output/

@@ -97,7 +97,9 @@ def iter_repositories(repositories, *, filter_=None):
                 raise RuntimeError('No origin or upstream configured for {}.'.format(path))
 
             logger.info('Cloning {} from {}'.format(path, remote_url))
-            os.system('git clone ' + ' '.join((remote_url, path, ) + ('-b', branch, ) if branch else ()))
+            cmd = 'git clone ' + ' '.join((remote_url, path, ) + (('-b', branch, ) if branch else ()))
+            logger.debug('cmd: '+cmd)
+            os.system(cmd)
 
         repo = git.Repo(path)
 
@@ -114,7 +116,7 @@ def create_or_update_repositories(repositories, sync=False):
             if remote.name in remotes and remote.url != remotes[remote.name] and remotes[remote.name]:
                 remote.set_url(remotes[remote.name])
                 need_fetch = True
-            remotes.pop(remote.name)
+            remotes.pop(remote.name, None)
 
         # add missing remotes
         for remote, url in remotes.items():

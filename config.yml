@@ -15,6 +15,9 @@ repositories:
         origin: {{ github('bonobo-selenium') }}
         upstream: {{ github('bonobo-selenium', user='python-bonobo') }}
 
+    - 'cookiecutter-bonobo':
+        upstream: {{ github('cookiecutter-bonobo', user='python-bonobo') }}
+
     - 'vendors/edgy-event':
         origin: {{ github('event', user='python-edgy') }}
 
