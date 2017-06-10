@@ -2,4 +2,4 @@
 
 __path__=$(cd $(dirname "$0")/..; pwd)
 
-(cd $__path__; bin/python bin/_bdk.py $*)
+(cd $__path__; .virtualenvs/3.5/bin/python bin/_bdk.py $*)

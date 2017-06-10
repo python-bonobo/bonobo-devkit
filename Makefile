@@ -12,8 +12,8 @@ PYTHON ?= $(PYTHON_BIN)/python$(PYTHON_VERSION)
 PYTEST ?= $(PYTHON_BIN)/pytest
 PYTEST_OPTIONS ?= --capture=no
 TWINE ?= $(PYTHON_BIN)/twine
-SYSTEMPYTHON ?= $(shell which python3)
-SYSTEMVIRTUALENV ?= $(shell which virtualenv)
+SYSTEMPYTHON ?= $(shell which python$(PYTHON_VERSION))
+SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m venv
 
 FORMAT_TARGETS := $(addprefix format-,$(PACKAGES))
 INSTALL_REQS_TARGETS := $(addprefix install-reqs-,$(PYTHON_VERSIONS))
@@ -33,7 +33,7 @@ VERSION := $(shell $(PYTHON) $(PACKAGE)/setup.py --version 2>/dev/null)
 
 install: $(INSTALL_TARGETS)
 	$(PYTHON) bin/_bdk.py init
-	$(MAKE) -j2 $(INSTALL_REQS_TARGETS)
+	$(MAKE) $(INSTALL_REQS_TARGETS)
 
 do-install: $(PYTHON_BASE)
 	$(PYTHON_PIP) install -r requirements.txt
@@ -42,7 +42,7 @@ do-install-reqs: $(PYTHON_BASE)
 	$(PYTHON_PIP) install -r .requirements.local.txt
 
 $(PYTHON_BASE):
-	$(SYSTEMVIRTUALENV) -p python$(PYTHON_VERSION) $@
+	$(SYSTEMVIRTUALENV) $@
 	$(PYTHON) -m ensurepip --upgrade
 
 $(INSTALL_TARGETS): install-%:
