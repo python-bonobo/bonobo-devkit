@@ -1,19 +1,22 @@
 import argparse
-import os
-import re
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
-
 import git
 import jinja2
+import json
+import os
+import re
 import yaml
+
 from colorama import Fore, Style
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from git.util import join_path
 
 try:
     from bonobo.logging import getLogger
 except ImportError:
-    from logging import getLogger
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    getLogger = logging.getLogger
 
 logger = getLogger('bdk')
 tasks = []
@@ -47,7 +50,12 @@ def load_configuration():
     with open('config.yml') as f:
         template = jinja2.Template(f.read())
 
-    source = template.render(github_username=github_username)
+    def _github(name, user=github_username):
+        if not user:
+            return 'null'
+        return json.dumps('git@github.com:{user}/{name}'.format(user=user, name=name))
+
+    source = template.render(github=_github)
     config = yaml.load(source)
 
     if os.path.exists('config.local.yml'):
@@ -73,8 +81,14 @@ def iter_repositories(repositories, *, filter_=None):
             continue
 
         if not os.path.exists(path):
-            logger.info('Cloning {} from {}'.format(path, remotes['origin']))
-            os.system('git clone ' + remotes['origin'] + ' ' + path)
+            remote_url = remotes.get('origin', None)
+            if not remote_url:
+                remote_url = remotes.get('upstream', None)
+            if not remote_url:
+              raise RuntimeError('No origin or upstream configured for {}.'.format(path))
+
+            logger.info('Cloning {} from {}'.format(path, remote_url))
+            os.system('git clone ' + remote_url + ' ' + path)
 
         repo = git.Repo(path)
 
@@ -88,15 +102,16 @@ def create_or_update_repositories(repositories, sync=False):
 
         # update the remotes if the url does not match the config
         for remote in repo.remotes:
-            if remote.name in remotes and remote.url != remotes[remote.name]:
+            if remote.name in remotes and remote.url != remotes[remote.name] and remotes[remote.name]:
                 remote.set_url(remotes[remote.name])
                 need_fetch = True
             remotes.pop(remote.name)
 
         # add missing remotes
         for remote, url in remotes.items():
-            need_fetch = True
-            repo.create_remote(remote, url)
+            if url:
+                need_fetch = True
+                repo.create_remote(remote, url)
 
         if need_fetch:
             def task(path=path, remotes=repo.remotes, logger=logger):

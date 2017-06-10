@@ -1,22 +1,23 @@
 repositories:
     - bonobo[dev]:
-        origin: git@github.com:{{ github_username }}/bonobo.git
-        upstream: git@github.com:python-bonobo/bonobo.git
+        origin: {{ github('bonobo') }}
+        upstream: {{ github('bonobo', user='python-bonobo') }}
 
     - bonobo-docker[dev]:
-        origin: git@github.com:{{ github_username }}/bonobo-docker.git
-        upstream: git@github.com:python-bonobo/bonobo-docker.git
+        origin: {{ github('bonobo-docker') }}
+        upstream: {{ github('bonobo-docker', user='python-bonobo') }}
 
     - bonobo-sqlalchemy[dev]:
-        origin: git@github.com:{{ github_username }}/bonobo-sqlalchemy.git
-        upstream: git@github.com:python-bonobo/bonobo-sqlalchemy.git
+        origin: {{ github('bonobo-sqlalchemy') }}
+        upstream: {{ github('bonobo-sqlalchemy', user='python-bonobo') }}
 
     - bonobo-selenium[dev]:
-        origin: git@github.com:{{ github_username }}/bonobo-selenium.git
-        upstream: git@github.com:python-bonobo/bonobo-selenium.git
+        origin: {{ github('bonobo-selenium') }}
+        upstream: {{ github('bonobo-selenium', user='python-bonobo') }}
 
     - vendors/edgy-event:
-        origin: git@github.com:python-edgy/event.git
+        origin: {{ github('event', user='python-edgy') }}
 
     - vendors/edgy-project:
-        origin: git@github.com:python-edgy/project.git
+        origin: {{ github('project', user='python-edgy') }}
+
