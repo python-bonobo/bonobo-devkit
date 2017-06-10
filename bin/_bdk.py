@@ -41,8 +41,12 @@ def load_configuration():
     gitconfig = git.GitConfigParser([os.path.normpath(os.path.expanduser("~/.gitconfig"))], read_only=True)
     github_username = gitconfig.get('github', 'user', fallback=None)
 
+    if not github_username:
+        logger.error('No github username set. Please run "git config --global github.user your-username".')
+
     with open('config.yml') as f:
         template = jinja2.Template(f.read())
+
     source = template.render(github_username=github_username)
     config = yaml.load(source)
 
@@ -68,6 +72,10 @@ def iter_repositories(repositories, *, filter_=None):
         if filter_ and path != filter_:
             continue
 
+        if not os.path.exists(path):
+            logger.info('Cloning {} from {}'.format(path, remotes['origin']))
+            os.system('git clone ' + remotes['origin'] + ' ' + path)
+
         repo = git.Repo(path)
 
         yield path, repo, remotes, extras
@@ -77,12 +85,6 @@ def create_or_update_repositories(repositories, sync=False):
     packages = []
     for path, repo, remotes, extras in iter_repositories(repositories):
         need_fetch = sync
-
-        if not os.path.exists(path):
-            logger.info('Cloning {} from {}'.format(path, remotes['origin']))
-            os.system('git clone ' + remotes['origin'] + ' ' + path)
-
-        repo = git.Repo(path)
 
         # update the remotes if the url does not match the config
         for remote in repo.remotes:
