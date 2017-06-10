@@ -15,11 +15,15 @@ try:
     from bonobo.logging import getLogger
 except ImportError:
     import logging
+
     logging.basicConfig(level=logging.INFO)
     getLogger = logging.getLogger
 
 logger = getLogger('bdk')
 tasks = []
+
+GITHUB_PROTOCOL = os.environ.get('GITHUB_PROTOCOL', 'ssh')
+assert GITHUB_PROTOCOL in ('ssh', 'https'), 'Unsupported github protocol.'
 
 
 def merge(a, b, path=None):
@@ -51,9 +55,12 @@ def load_configuration():
         template = jinja2.Template(f.read())
 
     def _github(name, user=github_username):
-        if not user:
-            return 'null'
-        return json.dumps('git@github.com:{user}/{name}'.format(user=user, name=name))
+        if user:
+            if GITHUB_PROTOCOL == 'ssh':
+                return json.dumps('git@github.com:{user}/{name}'.format(user=user, name=name))
+            elif GITHUB_PROTOCOL == 'https':
+                return json.dumps('https://github.com/{user}/{name}'.format(user=user, name=name))
+        return 'null'
 
     source = template.render(github=_github)
     config = yaml.load(source)
@@ -85,7 +92,7 @@ def iter_repositories(repositories, *, filter_=None):
             if not remote_url:
                 remote_url = remotes.get('upstream', None)
             if not remote_url:
-              raise RuntimeError('No origin or upstream configured for {}.'.format(path))
+                raise RuntimeError('No origin or upstream configured for {}.'.format(path))
 
             logger.info('Cloning {} from {}'.format(path, remote_url))
             os.system('git clone ' + remote_url + ' ' + path)
