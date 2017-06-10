@@ -8,9 +8,10 @@ PYTHON_VERSIONS ?= $(foreach v,3.5 3.6 3.7,$(shell which python$v >/dev/null && 
 PYTHON_VERSION ?= $(firstword $(PYTHON_VERSIONS))
 SYSTEMPYTHON ?= $(shell which python$(PYTHON_VERSION))
 SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m venv --copies
-PYTHON_BASE ?= $(if $(SKIP_VIRTUALENV), $(SYSTEMPYTHON), $(PWD)/.virtualenvs/$(PYTHON_VERSION))
-PYTHON_BIN ?= $(if $(SKIP_VIRTUALENV), $(shell dirname $(SYSTEMPYTHON)), $(PYTHON_BASE)/bin)
+PYTHON_BASE ?= $(if $(SKIP_VIRTUALENV),$(SYSTEMPYTHON),$(PWD)/.virtualenvs/$(PYTHON_VERSION))
+PYTHON_BIN ?= $(if $(SKIP_VIRTUALENV),$(shell dirname $(SYSTEMPYTHON)),$(PYTHON_BASE)/bin)
 PYTHON ?= $(PYTHON_BIN)/python$(PYTHON_VERSION)
+BDK ?= $(PYTHON) bin/_bdk.py
 PYTHON_PIP ?= $(PYTHON) -m pip
 PYTEST ?= $(PYTHON_BIN)/pytest
 PYTEST_OPTIONS ?= --capture=no
@@ -33,7 +34,7 @@ VERSION := $(shell $(PYTHON) $(PACKAGE)/setup.py --version 2>/dev/null)
 .PHONY: install do-install do-install-reqs $(INSTALL_TARGETS) $(INSTALL_REQS_TARGETS)
 
 install: $(INSTALL_TARGETS)
-	$(PYTHON) bin/_bdk.py init
+	$(BDK) init
 	$(MAKE) $(INSTALL_REQS_TARGETS)
 
 do-install: $(PYTHON_BASE)
@@ -59,7 +60,7 @@ $(INSTALL_REQS_TARGETS): install-reqs-%:
 format: $(FORMAT_TARGETS)
 
 do-format:
-	cd $(PACKAGE); QUICK=1 PYTHON=$(PYTHON) make format;
+	cd $(PACKAGE); QUICK=1 PYTHON=$(PYTHON) $(MAKE) format;
 
 $(FORMAT_TARGETS): format-%:
 	PYTHON_VERSION=3.6 PACKAGE=$* $(MAKE) do-format
@@ -69,6 +70,7 @@ $(FORMAT_TARGETS): format-%:
 #
 
 update: $(UPDATE_TARGETS)
+	$(BDK) status
 
 do-update:
 	cd $(PACKAGE); rm requirements*.txt; edgy-project update;
@@ -111,7 +113,7 @@ release: $(RELEASE_TARGETS)
 upload: $(UPLOAD_TARGETS)
 
 do-release: output
-	$(eval TMP := $(shell mktemp -d))
+	$(eval TMP := $(shell mktemp -dt bonobo-releases))
 	@echo "Cooking $(PACKAGE) $(VERSION) release (in $(TMP))"
 	@(cd $(PACKAGE); git rev-parse $(VERSION))
 	@(cd $(PACKAGE); git archive `git rev-parse $(VERSION)`) | tar xf - -C $(TMP)

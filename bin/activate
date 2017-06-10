@@ -1,0 +1,8 @@
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+source $PWD/bin/activate3.5
+
+alias bdk="$PWD/bin/bdk"
+alias cdproject="cd $PWD"
+
