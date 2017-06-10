@@ -7,8 +7,8 @@ PYTHON_VERSIONS ?= $(foreach v,3.5 3.6 3.7,$(shell which python$v >/dev/null && 
 PYTHON_VERSION ?= $(firstword $(PYTHON_VERSIONS))
 PYTHON_BASE ?= $(PWD)/.virtualenvs/$(PYTHON_VERSION)
 PYTHON_BIN ?= $(PYTHON_BASE)/bin
-PYTHON_PIP ?= $(PYTHON_BIN)/pip$(PYTHON_VERSION)
 PYTHON ?= $(PYTHON_BIN)/python$(PYTHON_VERSION)
+PYTHON_PIP ?= $(PYTHON) -m pip
 PYTEST ?= $(PYTHON_BIN)/pytest
 PYTEST_OPTIONS ?= --capture=no
 TWINE ?= $(PYTHON_BIN)/twine
