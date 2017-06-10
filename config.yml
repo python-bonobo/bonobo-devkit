@@ -1,21 +1,17 @@
 repositories:
-    - bonobo:
-        extras: dev
+    - bonobo[dev]:
         origin: git@github.com:{{ github_username }}/bonobo.git
         upstream: git@github.com:python-bonobo/bonobo.git
 
-    - bonobo-docker:
-        extras: dev
+    - bonobo-docker[dev]:
         origin: git@github.com:{{ github_username }}/bonobo-docker.git
         upstream: git@github.com:python-bonobo/bonobo-docker.git
 
-    - bonobo-sqlalchemy:
-        extras: dev
+    - bonobo-sqlalchemy[dev]:
         origin: git@github.com:{{ github_username }}/bonobo-sqlalchemy.git
         upstream: git@github.com:python-bonobo/bonobo-sqlalchemy.git
 
-    - bonobo-selenium:
-        extras: dev
+    - bonobo-selenium[dev]:
         origin: git@github.com:{{ github_username }}/bonobo-selenium.git
         upstream: git@github.com:python-bonobo/bonobo-selenium.git
 
@@ -24,4 +20,3 @@ repositories:
 
     - vendors/edgy-project:
         origin: git@github.com:python-edgy/project.git
-

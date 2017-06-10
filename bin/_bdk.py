@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
@@ -7,6 +8,7 @@ import git
 import jinja2
 import yaml
 from colorama import Fore, Style
+from git.util import join_path
 
 try:
     from bonobo.logging import getLogger
@@ -36,28 +38,44 @@ def merge(a, b, path=None):
 
 
 def load_configuration():
+    gitconfig = git.GitConfigParser([os.path.normpath(os.path.expanduser("~/.gitconfig"))], read_only=True)
+    github_username = gitconfig.get('github', 'user', fallback=None)
+
     with open('config.yml') as f:
         template = jinja2.Template(f.read())
-    source = template.render(github_username=os.environ.get('GITHUB_USERNAME', 'hartym'))
+    source = template.render(github_username=github_username)
     config = yaml.load(source)
 
     if os.path.exists('config.local.yml'):
         with open('config.local.yml') as f:
             template = jinja2.Template(f.read())
-        source = template.render(github_username=os.environ.get('GITHUB_USERNAME', 'hartym'))
+        source = template.render(github_username=github_username)
         config = merge(config, yaml.load(source))
 
     return config
 
 
-def create_or_update_repositories(repositories, sync=False):
-    packages = []
+def iter_repositories(repositories, *, filter_=None):
     for repository in repositories:
         assert len(repository) == 1
         path, remotes = list(repository.items())[0]
-        assert 'origin' in remotes
+        extras = ''
 
-        extras = remotes.pop('extras', '')
+        match = re.match('^(.*)\[(.*)\]$', path)
+        if match:
+            path, extras = match.groups()
+
+        if filter_ and path != filter_:
+            continue
+
+        repo = git.Repo(path)
+
+        yield path, repo, remotes, extras
+
+
+def create_or_update_repositories(repositories, sync=False):
+    packages = []
+    for path, repo, remotes, extras in iter_repositories(repositories):
         need_fetch = sync
 
         if not os.path.exists(path):
@@ -79,13 +97,13 @@ def create_or_update_repositories(repositories, sync=False):
             repo.create_remote(remote, url)
 
         if need_fetch:
-            for remote in repo.remotes:
-                def task(path=path, remote=remote, logger=logger):
-                    logger.info('Fetch begins: {} ({})'.format(path, remote.name))
+            def task(path=path, remotes=repo.remotes, logger=logger):
+                logger.info('Fetching {}...'.format(path))
+                for remote in remotes:
                     remote.fetch(tags=True)
-                    logger.info('Fetch complete: {} ({})'.format(path, remote.name))
+                    logger.info('  ...fetched {}:{}.'.format(path, remote.name))
 
-                tasks.append(task)
+            tasks.append(task)
 
         if os.path.exists(os.path.join(path, 'setup.py')):
             packages.append('-e {}{}'.format(path, '[' + extras + ']' if extras else ''))
@@ -109,34 +127,58 @@ def format_diff(diff, *, reverse=False):
 
 
 def get_repositories_status(repositories, filter_=None):
-    for repository in repositories:
-        assert len(repository) == 1
-        path, remotes = list(repository.items())[0]
-
-        if filter_ and path != filter_:
-            continue
-
-        repo = git.Repo(path)
-
+    for path, repo, remotes, extras in iter_repositories(repositories, filter_=filter_):
         if repo.is_dirty(untracked_files=True):
-            print(Fore.YELLOW, Style.BRIGHT, '• ', path, Style.RESET_ALL, ' (' + str(repo.active_branch) + ')', sep='')
+            print_repo_header(path, repo)
             for diff, name, color, reverse in (
                     (repo.index.diff(repo.head.commit), 'Changes to be committed:', Fore.GREEN, True),
                     (repo.index.diff(None), 'Changes not staged for commit:', Fore.RED, False),
                     (repo.untracked_files, 'Untracked files:', Fore.RED, False),):
                 if len(diff):
+                    print()
                     print('  ', name)
                     print(color, '\n'.join(map(partial(format_diff, reverse=reverse), diff)), Fore.RESET, sep='')
             print()
+        else:
+            if print_repo_header(path, repo, only_if_counts=True):
+                print()
+
+
+def format_count(cnt, sfg, efg):
+    return ' {}(+{}){}'.format(sfg, cnt, efg) if cnt else ''
+
+
+def print_repo_header(path, repo, only_if_counts=False):
+    active_branch = repo.active_branch
+    tracking_branch = repo.active_branch.tracking_branch()
+    local_count = len(list(repo.iter_commits('{}..{}'.format(tracking_branch, active_branch))))
+    remote_count = len(list(repo.iter_commits('{}..{}'.format(active_branch, tracking_branch))))
+
+    if not only_if_counts or local_count or remote_count:
+        header = (Fore.YELLOW, Style.BRIGHT, path, Style.RESET_ALL,)
+        header += (' ', Fore.LIGHTBLACK_EX, '[ ',)
+        header += (active_branch, format_count(local_count, Fore.LIGHTRED_EX, Fore.LIGHTBLACK_EX),)
+        header += (' -> ',)
+        header += (tracking_branch, format_count(remote_count, Fore.LIGHTGREEN_EX, Fore.LIGHTBLACK_EX),)
+
+        for remote in repo.remotes:
+            if remote.name == 'upstream':
+                upstream_branch = join_path(remote.name, active_branch.name)
+                upstream_count = len(list(repo.iter_commits('{}..{}'.format(tracking_branch, upstream_branch))))
+                header += (' -> ',)
+                header += (upstream_branch, format_count(remote_count, Fore.LIGHTGREEN_EX, Fore.LIGHTBLACK_EX),)
+                break
+
+        header += (' ]',)
+
+        print(*header, Style.RESET_ALL, sep='')
+        return True
+    return False
 
 
 def get_repositories_branches(repositories):
-    for repository in repositories:
-        assert len(repository) == 1
-        path, remotes = list(repository.items())[0]
-        repo = git.Repo(path)
-        print(Fore.YELLOW, Style.BRIGHT, path, Style.RESET_ALL, ' ', repo.active_branch, sep='')
-    pass
+    for path, repo, remotes, extras in iter_repositories(repositories):
+        print_repo_header(path, repo)
 
 
 def get_argument_parser():
@@ -145,11 +187,12 @@ def get_argument_parser():
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
-    init = subparsers.add_parser('init')
-    sync = subparsers.add_parser('sync')
-    status = subparsers.add_parser('status', aliases=('st',))
+    init = subparsers.add_parser('init', help='''Initialize all configured repositories.''')
+    sync = subparsers.add_parser('fetch', help='''Fetches new revisions from all remotes.''')
+    status = subparsers.add_parser('status', aliases=('st',),
+                                   help='''Display git status for all modified repositories.''')
     status.add_argument('filter', nargs='?')
-    branch = subparsers.add_parser('branch', aliases=('br',))
+    branch = subparsers.add_parser('branch', aliases=('br',), help='''Show active branch of all repositories.''')
 
     return parser
 
@@ -173,7 +216,7 @@ def main():
         raise Exception('Unknown command.')
 
     if len(tasks):
-        with ThreadPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
             for task in tasks:
                 executor.submit(task)
 
