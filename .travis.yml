@@ -6,7 +6,6 @@ python:
   - 3.6-dev
   - nightly
 install:
-  - ls -lsah .virtualenvs/3.*/bin/
   - GITHUB_PROTOCOL=https make install
   - ls -lsah .virtualenvs/3.*/bin/
   - pip install coveralls
