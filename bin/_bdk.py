@@ -4,6 +4,8 @@ import jinja2
 import json
 import os
 import re
+
+import sys
 import yaml
 
 from colorama import Fore, Style
@@ -209,6 +211,13 @@ def get_repositories_branches(repositories):
         print_repo_header(path, repo)
 
 
+def run_jupyter_notebook():
+    from unittest.mock import patch
+    with patch.object(sys, 'argv', ["jupyter", "notebook"]):
+        from jupyter_core.command import main as jupyter
+        jupyter()
+
+
 def get_argument_parser():
     parser = argparse.ArgumentParser(prog='bin/bdk')
 
@@ -221,6 +230,7 @@ def get_argument_parser():
                                    help='''Display git status for all modified repositories.''')
     status.add_argument('filter', nargs='?')
     branch = subparsers.add_parser('branch', aliases=('br',), help='''Show active branch of all repositories.''')
+    notebook = subparsers.add_parser('notebook', aliases=('nb', ), help='''Runs jupyter notebook.''')
 
     return parser
 
@@ -240,6 +250,8 @@ def main():
         get_repositories_status(repositories, filter_=options.filter)
     elif options.command in ('branch', 'br'):
         get_repositories_branches(repositories)
+    elif options.command in ('notebook', 'nb'):
+        run_jupyter_notebook()
     else:
         raise Exception('Unknown command.')
 
