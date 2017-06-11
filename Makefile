@@ -7,7 +7,7 @@ IMPORTS ?= $(subst -,_,$(PACKAGES))
 PYTHON_VERSIONS ?= $(foreach v,3.5 3.6 3.7,$(shell which python$v >/dev/null && echo '$v'))
 PYTHON_VERSION ?= $(firstword $(PYTHON_VERSIONS))
 SYSTEMPYTHON ?= $(shell which python$(PYTHON_VERSION))
-SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m venv --copies
+SYSTEMVIRTUALENV ?= $(SYSTEMPYTHON) -m virtualenv -p python$(PYTHON_VERSION)
 PYTHON_BASE ?= $(if $(SKIP_VIRTUALENV),$(SYSTEMPYTHON),$(PWD)/.virtualenvs/$(PYTHON_VERSION))
 PYTHON_BIN ?= $(if $(SKIP_VIRTUALENV),$(shell dirname $(SYSTEMPYTHON)),$(PYTHON_BASE)/bin)
 PYTHON ?= $(PYTHON_BIN)/python$(PYTHON_VERSION)
@@ -44,6 +44,7 @@ do-install-reqs: $(PYTHON_BASE)
 	$(PYTHON_PIP) install -r .requirements.local.txt
 
 $(PYTHON_BASE):
+	-$(SYSTEMPYTHON) -m pip install --upgrade pip virtualenv
 	$(SYSTEMVIRTUALENV) $@
 	$(PYTHON) -m ensurepip --upgrade
 
@@ -78,8 +79,6 @@ do-update:
 
 $(UPDATE_TARGETS): update-%:
 	PYTHON_VERSION=3.6 PACKAGE=$* $(MAKE) do-update
-
-
 
 #
 # Test targets
