@@ -5,4 +5,4 @@ jinja2==2.9.6
 pip==9.0.1
 pyyaml==3.12
 twine==1.9.1
-wheel
+wheel==0.29.0
