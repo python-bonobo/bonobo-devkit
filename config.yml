@@ -1,5 +1,5 @@
 repositories:
-    - 'bonobo@develop[dev]':
+    - 'bonobo@develop[dev,jupyter]':
         origin: {{ github('bonobo') }}
         upstream: {{ github('bonobo', user='python-bonobo') }}
 

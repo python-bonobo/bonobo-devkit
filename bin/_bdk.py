@@ -4,6 +4,8 @@ import jinja2
 import json
 import os
 import re
+
+import sys
 import yaml
 
 from colorama import Fore, Style
@@ -136,7 +138,7 @@ def create_or_update_repositories(repositories, sync=False):
         if os.path.exists(os.path.join(path, 'setup.py')):
             packages.append('-e {}{}'.format(path, '[' + extras + ']' if extras else ''))
 
-    with open('.requirements.local.txt', 'w+') as f:
+    with open('.requirements.txt', 'w+') as f:
         f.write('\n'.join(packages))
 
 
@@ -178,7 +180,7 @@ def format_count(cnt, sfg, efg):
 
 def print_repo_header(path, repo, only_if_counts=False):
     active_branch = repo.active_branch
-    tracking_branch = repo.active_branch.tracking_branch()
+    tracking_branch = repo.active_branch.tracking_branch() or 'HEAD'
     local_count = len(list(repo.iter_commits('{}..{}'.format(tracking_branch, active_branch))))
     remote_count = len(list(repo.iter_commits('{}..{}'.format(active_branch, tracking_branch))))
 
@@ -186,8 +188,10 @@ def print_repo_header(path, repo, only_if_counts=False):
         header = (Fore.YELLOW, Style.BRIGHT, path, Style.RESET_ALL,)
         header += (' ', Fore.LIGHTBLACK_EX, '[ ',)
         header += (active_branch, format_count(local_count, Fore.LIGHTRED_EX, Fore.LIGHTBLACK_EX),)
-        header += (' -> ',)
-        header += (tracking_branch, format_count(remote_count, Fore.LIGHTGREEN_EX, Fore.LIGHTBLACK_EX),)
+
+        if tracking_branch != 'HEAD':
+            header += (' -> ',)
+            header += (tracking_branch, format_count(remote_count, Fore.LIGHTGREEN_EX, Fore.LIGHTBLACK_EX),)
 
         for remote in repo.remotes:
             if remote.name == 'upstream':
@@ -209,6 +213,13 @@ def get_repositories_branches(repositories):
         print_repo_header(path, repo)
 
 
+def run_jupyter_notebook():
+    from unittest.mock import patch
+    with patch.object(sys, 'argv', ["jupyter", "notebook"]):
+        from jupyter_core.command import main as jupyter
+        jupyter()
+
+
 def get_argument_parser():
     parser = argparse.ArgumentParser(prog='bin/bdk')
 
@@ -221,6 +232,7 @@ def get_argument_parser():
                                    help='''Display git status for all modified repositories.''')
     status.add_argument('filter', nargs='?')
     branch = subparsers.add_parser('branch', aliases=('br',), help='''Show active branch of all repositories.''')
+    notebook = subparsers.add_parser('notebook', aliases=('nb', ), help='''Runs jupyter notebook.''')
 
     return parser
 
@@ -240,6 +252,8 @@ def main():
         get_repositories_status(repositories, filter_=options.filter)
     elif options.command in ('branch', 'br'):
         get_repositories_branches(repositories)
+    elif options.command in ('notebook', 'nb'):
+        run_jupyter_notebook()
     else:
         raise Exception('Unknown command.')
 

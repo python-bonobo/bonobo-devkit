@@ -5,4 +5,6 @@ source $PWD/bin/activate3.5
 
 alias bdk="$PWD/bin/bdk"
 alias cdproject="cd $PWD"
+alias python3.5="$PWD/.virtualenvs/3.5/bin/python3.5"
+alias python3.6="$PWD/.virtualenvs/3.6/bin/python3.6"
 

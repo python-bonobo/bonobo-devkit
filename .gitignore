@@ -27,7 +27,7 @@
 .spyderproject
 .tox/
 .webassets-cache
-/.requirements.local.txt
+/.requirements.txt
 /.virtualenvs
 /bonobo*/
 /cookiecutter-bonobo/
