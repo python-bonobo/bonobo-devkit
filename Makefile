@@ -41,7 +41,7 @@ do-install: $(PYTHON_BASE)
 	$(PYTHON_PIP) install -r requirements.txt
 
 do-install-reqs: $(PYTHON_BASE)
-	$(PYTHON_PIP) install -r .requirements.local.txt
+	$(PYTHON_PIP) install -r .requirements.txt
 
 $(PYTHON_BASE):
 	-$(SYSTEMPYTHON) -m pip install --upgrade pip virtualenv
