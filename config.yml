@@ -18,9 +18,9 @@ repositories:
     - 'cookiecutter-bonobo':
         upstream: {{ github('cookiecutter-bonobo', user='python-bonobo') }}
 
-    - 'vendors/edgy-event':
-        origin: {{ github('event', user='python-edgy') }}
+    - 'vendors/whistle':
+        origin: {{ github('whistle', user='python-whistle') }}
 
-    - 'vendors/edgy-project':
-        origin: {{ github('project', user='python-edgy') }}
+    - 'vendors/medikit':
+        origin: {{ github('medikit', user='python-medikit') }}
 
