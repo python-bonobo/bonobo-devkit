@@ -18,9 +18,18 @@ repositories:
     - 'cookiecutter-bonobo':
         upstream: {{ github('cookiecutter-bonobo', user='python-bonobo') }}
 
+    - 'wiki':
+        upstream: {{ github('bonobo.wiki', user='python-bonobo') }}
+
     - 'vendors/whistle':
         origin: {{ github('whistle', user='python-whistle') }}
 
     - 'vendors/medikit':
         origin: {{ github('medikit', user='python-medikit') }}
+
+    - 'vendors/medikit':
+        origin: {{ github('mondrian', user='hartym') }}
+
+    - 'vendors/git-semver':
+        origin: {{ github('git-semver', user='hartym') }}
 
