@@ -27,7 +27,7 @@ repositories:
     - 'vendors/medikit':
         origin: {{ github('medikit', user='python-medikit') }}
 
-    - 'vendors/medikit':
+    - 'vendors/mondrian':
         origin: {{ github('mondrian', user='hartym') }}
 
     - 'vendors/git-semver':
