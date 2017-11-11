@@ -7,4 +7,5 @@ alias bdk="$PWD/bin/bdk"
 alias cdproject="cd $PWD"
 alias python3.5="$PWD/.virtualenvs/3.5/bin/python3.5"
 alias python3.6="$PWD/.virtualenvs/3.6/bin/python3.6"
+alias python3.7="$PWD/.virtualenvs/3.6/bin/python3.7"
 
