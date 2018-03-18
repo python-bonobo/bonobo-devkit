@@ -141,6 +141,11 @@ def create_or_update_repositories(repositories, sync=False):
     with open('.requirements.txt', 'w+') as f:
         f.write('\n'.join(packages))
 
+    try:
+        os.makedirs('sandbox')
+    except FileExistsError:
+        pass
+
 
 def format_diff(diff, *, reverse=False):
     if isinstance(diff, git.diff.Diff):
