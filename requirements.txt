@@ -6,4 +6,4 @@ pip==9.0.2
 python-dotenv==0.8.2
 pyyaml==3.12
 twine==1.10.0
-wheel==0.30.0
+wheel==0.32.0
