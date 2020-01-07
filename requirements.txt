@@ -4,6 +4,6 @@ gitpython==2.1.8
 jinja2==2.10
 pip==9.0.2
 python-dotenv==0.8.2
-pyyaml==3.12
+pyyaml==5.3
 twine==1.10.0
 wheel==0.30.0
